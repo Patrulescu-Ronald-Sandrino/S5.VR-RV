@@ -20,97 +20,10 @@ namespace rt
             Directory.CreateDirectory(frames);
 
             // Scene
-            var geometries = new Geometry[]
-            {
-                new Sphere(
-                    new Vector(-50.0, -25.0, 175.0),
-                    30.0,
-                    new Material(
-                        new Color(0.1, 0.0, 0.0, 1.0),
-                        new Color(0.3, 0.0, 0.0, 1.0),
-                        new Color(0.5, 0.0, 0.0, 1.0),
-                        10
-                    ),
-                    new Color(0.8, 0.0, 0.0, 1.0)),
-                new Sphere(
-                    new Vector(-10.0, 0.0, 100.0),
-                    10.0,
-                    new Material(
-                        new Color(0.1, 0.1, 0.0, 1.0),
-                        new Color(0.3, 0.3, 0.0, 1.0),
-                        new Color(0.5, 0.5, 0.0, 1.0),
-                        10
-                    ),
-                    new Color(0.8, 0.8, 0.0, 1.0)
-                ),
-                new Sphere(
-                    new Vector(0.0, 0.0, 200.0),
-                    40.0,
-                    new Material(
-                        new Color(0.0, 0.1, 0.0, 1.0),
-                        new Color(0.0, 0.3, 0.0, 1.0),
-                        new Color(0.0, 0.5, 0.5, 1.0),
-                        10
-                    ),
-                    new Color(0.0, 0.8, 0.0, 1.0)
-                ),
-                new Sphere(new Vector(0.0, -50.0, 200.0),
-                    10.0,
-                    new Material(
-                        new Color(0.1, 0.1, 0.1, 1.0),
-                        new Color(0.3, 0.3, 0.3, 1.0),
-                        new Color(0.5, 0.5, 0.5, 1.0),
-                        10
-                    ),
-                    new Color(0.8, 0.8, 0.8, 1.0)
-                ),
-                new Sphere(
-                    new Vector(10.0, 0.0, 20.0),
-                    5.0,
-                    new Material(
-                        new Color(0.0, 0.1, 0.1, 1.0),
-                        new Color(0.0, 0.3, 0.3, 1.0),
-                        new Color(0.0, 0.5, 0.5, 1.0),
-                        10
-                    ),
-                    new Color(0.0, 0.8, 0.8, 1.0)
-                ),
-                new Sphere(
-                    new Vector(-70.0, 0.0, 100.0),
-                    10.0,
-                    new Material(
-                        new Color(0.1, 0.0, 0.1, 1.0),
-                        new Color(0.3, 0.0, 0.3, 1.0),
-                        new Color(0.5, 0.0, 0.5, 1.0),
-                        10
-                    ),
-                    new Color(0.8, 0.0, 0.8, 1.0)
-                ),
-                new Sphere(
-                    new Vector(50.0, 25.0, 75.0),
-                    50.0,
-                    new Material(
-                        new Color(0.0, 0.0, 0.1, 1.0),
-                        new Color(0.0, 0.0, 0.3, 1.0),
-                        new Color(0.0, 0.0, 0.5, 1.0),
-                        10
-                    ),
-                    new Color(0.0, 0.0, 0.8, 1.0)
-                ),
-                new Sphere(
-                    new Vector(-75.0, 15.0, -75.0),
-                    5.0,
-                    new Material(
-                        new Color(0.07, 0.07, 0.07, 1.0),
-                        new Color(0.2, 0.2, 0.2, 1.0),
-                        new Color(0.3, 0.4, 0.4, 1.0),
-                        10
-                    ),
-                    new Color(0.07, 0.07, 0.07, 1.0)
-                )
-            };
+            var matrix = Matrix.Create(181, 217, 181, "data/head-181x217x181.dat");
+            // var matrix = Matrix.Create(47, 512, 512, "data/vertebra-47x512x512.dat");
 
-            var lights = new Light[]
+            var lights = new[]
             {
                 new Light(
                     new Vector(-50.0, 0.0, 0.0),
@@ -134,7 +47,8 @@ namespace rt
                     1.0
                 )
             };
-            var rt = new RayTracer(geometries, lights);
+            
+            var rt = new RayTracer(matrix, lights);
 
             const int width = 800;
             const int height = 600;

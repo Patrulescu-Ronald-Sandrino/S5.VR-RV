@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
 namespace rt
 {
     class RayTracer
     {
         private Geometry[] geometries;
+        private Matrix matrix;
         private Light[] lights;
 
-        public RayTracer(Geometry[] geometries, Light[] lights)
+        public RayTracer(Matrix matrix, Light[] lights)
         {
-            this.geometries = geometries;
+            this.matrix = matrix;
             this.lights = lights;
         }
 
@@ -25,7 +25,7 @@ namespace rt
         {
             var intersection = new Intersection {Valid = false};
 
-            foreach (var geometry in geometries)
+            /*foreach (var geometry in geometries)
             {
                 var intr = geometry.GetIntersection(ray, minDist, maxDist);
 
@@ -39,7 +39,7 @@ namespace rt
                 {
                     intersection = intr;
                 }
-            }
+            }*/
 
             return intersection;
         }
@@ -66,7 +66,7 @@ namespace rt
                         + camera.Up * ImageToViewPlane(j, height, camera.ViewPlaneHeight)
                         + (camera.Up ^ camera.Direction) * ImageToViewPlane(i, width, camera.ViewPlaneWidth);
                     
-                    var intersection = FindFirstIntersection(
+                    var intersection = FindFirstIntersection( // TODO: replace this with new code
                         new Line(camera.Position, x1), 
                         camera.FrontPlaneDistance, 
                         camera.BackPlaneDistance
