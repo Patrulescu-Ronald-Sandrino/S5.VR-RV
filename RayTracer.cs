@@ -8,6 +8,7 @@ namespace rt
         private Matrix matrix;
         private Func<int, Color> colorMapper;
         private Light[] lights;
+        private static double FREQUENCY = 5;
 
         public RayTracer(Matrix matrix, Func<int, Color> colorMapper, Light[] lights)
         {
@@ -23,35 +24,82 @@ namespace rt
             return u;
         }
 
-        private Intersection FindFirstIntersection(Line ray, double minDist, double maxDist)
+//         private Intersection FindFirstIntersection(Line ray, double minDist, double maxDist)
+//         {
+//             var intersection = new Intersection {Valid = false};
+//
+//             /*foreach (var geometry in geometries)
+//             {
+//                 var intr = geometry.GetIntersection(ray, minDist, maxDist);
+//
+//                 if (!intr.Valid || !intr.Visible) continue;
+//
+//                 if (!intersection.Valid || !intersection.Visible)
+//                 {
+//                     intersection = intr;
+//                 }
+//                 else if (intr.T < intersection.T)
+//                 {
+//                     intersection = intr;
+//                 }
+//             }*/
+//
+//             return intersection;
+//         }
+
+        // private bool IsLit(Vector point, Light light)
+        // {
+        //     // ADD CODE HERE: Detect whether the given point has a clear line of sight to the given light
+        //     var intersection = FindFirstIntersection(new Line(light.Position, point), 0.0, (light.Position - point).Length() - 0.01);
+        //     
+        //     return !intersection.Visible;
+        // }
+
+        // aabb vs ray collision/intersection
+        // source: https://link.springer.com/content/pdf/10.1007/978-1-4842-7185-8.pdf (Ray Tracing Gems II) pag 556
+        // https://gdbooks.gitbooks.io/3dcollisions/content/Chapter3/raycast_aabb.html
+        private double FindFirstIntersection(Line cameraRay, double minDist, double maxDist)
         {
-            var intersection = new Intersection {Valid = false};
+            var vMin = new Vector(0, 0, 0);
+            var vMax = new Vector(matrix.length, matrix.width, matrix.height);
 
-            /*foreach (var geometry in geometries)
+            var tMinX = (vMin.X - cameraRay.X0.X) / cameraRay.Dx.X;
+            var tMaxX = (vMax.X - cameraRay.X0.X) / cameraRay.Dx.X;
+            var tMinY = (vMin.Y - cameraRay.X0.Y) / cameraRay.Dx.Y;
+            var tMaxY = (vMax.Y - cameraRay.X0.Y) / cameraRay.Dx.Y;
+            var tMinZ = (vMin.Z - cameraRay.X0.Z) / cameraRay.Dx.Z;
+            var tMaxZ = (vMax.Z - cameraRay.X0.Z) / cameraRay.Dx.Z;
+            
+            var tMin = Math.Max(Math.Max(Math.Min(tMinX, tMaxX), Math.Min(tMinY, tMaxY)), Math.Min(tMinZ, tMaxZ));
+            var tMax = Math.Min(Math.Min(Math.Max(tMinX, tMaxX), Math.Max(tMinY, tMaxY)), Math.Max(tMinZ, tMaxZ));
+            
+            if (tMax < 0 || tMin > tMax)
             {
-                var intr = geometry.GetIntersection(ray, minDist, maxDist);
+                return -1;
+            }
+            
+            var t = tMin < 0 ? tMax : tMin;
+            
+            if (t - minDist < 0.0001 || t - maxDist > 0.0001)
+            {
+                return -1;
+            }
 
-                if (!intr.Valid || !intr.Visible) continue;
-
-                if (!intersection.Valid || !intersection.Visible)
-                {
-                    intersection = intr;
-                }
-                else if (intr.T < intersection.T)
-                {
-                    intersection = intr;
-                }
-            }*/
-
-            return intersection;
+            return t;
         }
 
-        private bool IsLit(Vector point, Light light)
+        private Color FindColor(Line cameraRay, double minDist, double maxDist)
         {
-            // ADD CODE HERE: Detect whether the given point has a clear line of sight to the given light
-            var intersection = FindFirstIntersection(new Line(light.Position, point), 0.0, (light.Position - point).Length() - 0.01);
+            var t = FindFirstIntersection(cameraRay, minDist, maxDist);
+            if (t.Equals(-1))
+            {
+                return new Color();
+            }
+            var intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
             
-            return !intersection.Visible;
+            
+            
+            return new Color();
         }
 
         public void Render(Camera camera, int width, int height, string filename)
@@ -62,59 +110,16 @@ namespace rt
             {
                 for (var j = 0; j < height; j++)
                 {
-                    #region ADD CODE HERE: Implement pixel color calculation
-                    var x1 = // the ray
+                    var x1 = // the ray from the origin through the pixel
                         camera.Position + camera.Direction * camera.ViewPlaneDistance 
-                        + camera.Up * ImageToViewPlane(j, height, camera.ViewPlaneHeight)
-                        + (camera.Up ^ camera.Direction) * ImageToViewPlane(i, width, camera.ViewPlaneWidth);
+                                        + camera.Up * ImageToViewPlane(j, height, camera.ViewPlaneHeight)
+                                        + (camera.Up ^ camera.Direction) * ImageToViewPlane(i, width, camera.ViewPlaneWidth);
+                    var cameraRay = new Line(camera.Position, x1); // the line from the camera through the pixel
+
+                    #region ADD CODE HERE: Implement pixel color calculation
+
+                    image.SetPixel(i, j, FindColor(cameraRay, camera.BackPlaneDistance, camera.FrontPlaneDistance));
                     
-                    var intersection = FindFirstIntersection( // TODO: replace this with new code
-                        new Line(camera.Position, x1), 
-                        camera.FrontPlaneDistance, 
-                        camera.BackPlaneDistance
-                        );
-
-                    if (intersection.Visible && intersection.Valid)
-                    {
-                        var position = intersection.Position;
-                        var sphere = (Sphere) intersection.Geometry;
-                        var material = sphere.Material;
-                        var imageColor = new Color(); // sphere.Color
-                        
-                        foreach (var light in lights)
-                        {
-                            var color = material.Ambient * light.Ambient;
-                            if (IsLit(position, light))
-                            {
-                                var n = sphere.Normal(position);
-                                // var n = (position - sphere.Center).Normalize();
-                                var t = (light.Position - position).Normalize();
-                                var n_Times_t = n * t;
-                                var e = (camera.Position - position).Normalize();
-                                var r = (n * n_Times_t * 2 - t).Normalize();
-                                var e_Times_r = e * r;
-                                
-                                if (n_Times_t > 0)
-                                {
-                                    color += material.Diffuse * light.Diffuse * n_Times_t;
-                                }
-
-                                if (e_Times_r > 0)
-                                {
-                                    color += material.Specular * light.Specular * Math.Pow(e_Times_r, material.Shininess);
-                                }
-
-                                color *= light.Intensity;
-                            }
-
-                            imageColor += color;
-                        }
-                        image.SetPixel(i, j, imageColor);
-                    }
-                    else
-                    {
-                        image.SetPixel(i, j, new Color());
-                    }
                     #endregion
                 }
             }

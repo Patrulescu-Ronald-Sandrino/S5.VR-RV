@@ -7,6 +7,10 @@ namespace rt
         public double X { get; set; }
         public double Y { get; set; }
         public double Z { get; set; }
+        
+        public static Vector XAxis = new Vector(1, 0, 0);
+        public static Vector YAxis = new Vector(0, 1, 0);
+        public static Vector ZAxis = new Vector(0, 0, 1);
 
         public Vector(double x, double y, double z)
         {
@@ -72,6 +76,11 @@ namespace rt
                 Z /= norm;
             }
             return this;
+        }
+
+        public bool AreAllValues(double value)
+        {
+            return X.Equals(value) && Y.Equals(value) && Z.Equals(value);
         }
     }
 }
