@@ -4,11 +4,12 @@ namespace rt
 {
     class RayTracer
     {
+        private static double FREQUENCY = 5;
+        
         private Geometry[] geometries;
         private Matrix matrix;
         private Func<int, Color> colorMapper;
         private Light[] lights;
-        private static double FREQUENCY = 5;
 
         public RayTracer(Matrix matrix, Func<int, Color> colorMapper, Light[] lights)
         {
@@ -87,6 +88,25 @@ namespace rt
 
             return t;
         }
+        
+        private Color GetMatrixPointColor(Vector point)
+        {
+            var x = (int) Math.Round(point.X);
+            var y = (int) Math.Round(point.Y);
+            var z = (int) Math.Round(point.Z);
+
+            return colorMapper(matrix.data[x, y, z]);
+        }
+
+        private static Color Blend(Color color, Color other)
+        {
+            return new Color(
+                color.Red * (1 - other.Alpha) + other.Red * other.Alpha,
+                color.Green * (1 - other.Alpha) + other.Green * other.Alpha,
+                color.Blue * (1 - other.Alpha) + other.Blue * other.Alpha, 
+                color.Alpha * (1 - other.Alpha) + other.Alpha * other.Alpha
+            );
+        }
 
         private Color FindColor(Line cameraRay, double minDist, double maxDist)
         {
@@ -96,10 +116,21 @@ namespace rt
                 return new Color();
             }
             var intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
+            var color = GetMatrixPointColor(intersectionPoint);
+
+            while (color.Alpha < 1)
+            {
+                t = FindFirstIntersection(cameraRay, t + 0.0001 + FREQUENCY, maxDist);
+                if (t.Equals(-1))
+                {
+                    return new Color();
+                }
+                intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
+                var newColor = GetMatrixPointColor(intersectionPoint);
+                color = Blend(color, newColor);
+            }
             
-            
-            
-            return new Color();
+            return color;
         }
 
         public void Render(Camera camera, int width, int height, string filename)
