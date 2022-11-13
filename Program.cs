@@ -6,6 +6,16 @@ namespace rt
 {
     public class Program
     {
+        private static readonly Func<int, Color> HeadColorMapper = value =>
+        {
+            if (value.IsInRange(0, 13)) return new Color(0, 0, 0, 0);
+            if (value.IsInRange(13, 100)) return new Color(1.0, 1.0, 0, 0.5);
+            if (value.IsInRange(100, 200)) return new Color(1.0, 0, 1.0, 0.5);
+            if (value.IsInRange(200, 256)) return new Color(0, 1.0, 1.0, 0.5);
+                
+            return new Color(0, 0, 0, 0);
+        };
+
         public static void Main(string[] args)
         {
             // Cleanup
@@ -22,6 +32,8 @@ namespace rt
             // Scene
             var matrix = Matrix.Create(181, 217, 181, "data/head-181x217x181.dat");
             // var matrix = Matrix.Create(47, 512, 512, "data/vertebra-47x512x512.dat");
+
+            var colorMapper = HeadColorMapper;
 
             var lights = new[]
             {
@@ -48,7 +60,7 @@ namespace rt
                 )
             };
             
-            var rt = new RayTracer(matrix, lights);
+            var rt = new RayTracer(matrix, colorMapper, lights);
 
             const int width = 800;
             const int height = 600;

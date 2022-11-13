@@ -6,11 +6,13 @@ namespace rt
     {
         private Geometry[] geometries;
         private Matrix matrix;
+        private Func<int, Color> colorMapper;
         private Light[] lights;
 
-        public RayTracer(Matrix matrix, Light[] lights)
+        public RayTracer(Matrix matrix, Func<int, Color> colorMapper, Light[] lights)
         {
             this.matrix = matrix;
+            this.colorMapper = colorMapper;
             this.lights = lights;
         }
 
@@ -61,7 +63,7 @@ namespace rt
                 for (var j = 0; j < height; j++)
                 {
                     #region ADD CODE HERE: Implement pixel color calculation
-                    var x1 =
+                    var x1 = // the ray
                         camera.Position + camera.Direction * camera.ViewPlaneDistance 
                         + camera.Up * ImageToViewPlane(j, height, camera.ViewPlaneHeight)
                         + (camera.Up ^ camera.Direction) * ImageToViewPlane(i, width, camera.ViewPlaneWidth);
