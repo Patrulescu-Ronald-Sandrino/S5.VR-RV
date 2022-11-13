@@ -17,5 +17,24 @@ namespace rt
             return Math.Abs(value - other) < Tolerance;
         }
         
+        public static bool GreaterThan(this double value, double other)
+        {
+            return value - other > Tolerance;
+        }
+        
+        public static bool LessThan(this double value, double other)
+        {
+            return other - value > Tolerance;
+        }
+        
+        public static bool GreaterThanOrEquals(this double value, double other)
+        {
+            return value.GreaterThan(other) || value.Equals(other);
+        }
+        
+        public static bool LessThanOrEquals(this double value, double other)
+        {
+            return value.LessThan(other) || value.Equals(other);
+        }
     }
 }

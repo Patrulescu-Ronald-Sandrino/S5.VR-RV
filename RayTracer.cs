@@ -94,6 +94,12 @@ namespace rt
             var x = (int) Math.Round(point.X);
             var y = (int) Math.Round(point.Y);
             var z = (int) Math.Round(point.Z);
+            // Console.WriteLine($"x: {x}, y: {y}, z: {z}");
+            
+            if (x < 0 || x >= matrix.length || y < 0 || y >= matrix.width || z < 0 || z >= matrix.height)
+            {
+                return new Color();
+            }
 
             return colorMapper(matrix.data[x, y, z]);
         }
@@ -101,10 +107,10 @@ namespace rt
         private static Color Blend(Color color, Color other)
         {
             return new Color(
-                color.Red * (1 - other.Alpha) + other.Red * other.Alpha,
-                color.Green * (1 - other.Alpha) + other.Green * other.Alpha,
-                color.Blue * (1 - other.Alpha) + other.Blue * other.Alpha, 
-                color.Alpha * (1 - other.Alpha) + other.Alpha * other.Alpha
+                color.Red * color.Alpha + other.Red * other.Alpha * (1 - color.Alpha),
+                color.Green * color.Alpha + other.Green * other.Alpha * (1 - color.Alpha),
+                color.Blue * color.Alpha + other.Blue * other.Alpha * (1 - color.Alpha),
+                color.Alpha + (1 - other.Alpha) * other.Alpha
             );
         }
 
@@ -118,12 +124,12 @@ namespace rt
             var intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
             var color = GetMatrixPointColor(intersectionPoint);
 
-            while (color.Alpha < 1)
+            while (color.Alpha.GreaterThan(0) && color.Alpha.LessThan(1))
             {
                 t = FindFirstIntersection(cameraRay, t + 0.0001 + FREQUENCY, maxDist);
                 if (t.Equals(-1))
                 {
-                    return new Color();
+                    return color;
                 }
                 intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
                 var newColor = GetMatrixPointColor(intersectionPoint);
@@ -149,7 +155,7 @@ namespace rt
 
                     #region ADD CODE HERE: Implement pixel color calculation
 
-                    image.SetPixel(i, j, FindColor(cameraRay, camera.BackPlaneDistance, camera.FrontPlaneDistance));
+                    image.SetPixel(i, j, FindColor(cameraRay, camera.FrontPlaneDistance, camera.BackPlaneDistance));
                     
                     #endregion
                 }
