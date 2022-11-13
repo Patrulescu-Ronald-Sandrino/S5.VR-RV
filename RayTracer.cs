@@ -73,15 +73,15 @@ namespace rt
             
             var tMin = Math.Max(Math.Max(Math.Min(tMinX, tMaxX), Math.Min(tMinY, tMaxY)), Math.Min(tMinZ, tMaxZ));
             var tMax = Math.Min(Math.Min(Math.Max(tMinX, tMaxX), Math.Max(tMinY, tMaxY)), Math.Max(tMinZ, tMaxZ));
-            
-            if (tMax < 0 || tMin > tMax)
+
+            if (tMax.LessThan(0) || tMin.GreaterThan(tMax))
             {
                 return -1;
             }
             
-            var t = tMin < 0 ? tMax : tMin;
+            var t = tMin.LessThan(0) ? tMax : tMin;
             
-            if (t - minDist < 0.0001 || t - maxDist > 0.0001)
+            if (t.LessThan(minDist) || t.GreaterThan(maxDist))
             {
                 return -1;
             }
