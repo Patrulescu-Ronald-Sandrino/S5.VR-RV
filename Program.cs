@@ -38,10 +38,10 @@ namespace rt
             Directory.CreateDirectory(frames);
 
             // Scene
-            // var matrix = Matrix.Create(181, 217, 181, "data/head-181x217x181.dat");
-            var matrix = Matrix.Create(47, 512, 512, "data/vertebra-47x512x512.dat");
+            var matrix = Matrix.Create(181, 217, 181, "data/head-181x217x181.dat");
+            // var matrix = Matrix.Create(47, 512, 512, "data/vertebra-47x512x512.dat");
 
-            var colorMapper = VertebraColorMapper;
+            var colorMapper = HeadColorMapper; // HeadColorMapper or VertebraColorMapper
 
             var lights = new[]
             {
