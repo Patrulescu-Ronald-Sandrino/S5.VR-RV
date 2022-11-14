@@ -13,7 +13,15 @@ namespace rt
             if (value.IsInRange(100, 200)) return new Color(1.0, 0, 1.0, 0.5);
             if (value.IsInRange(200, 256)) return new Color(0, 1.0, 1.0, 0.5);
                 
-            return new Color(0, 0, 0, 0);
+            return new Color();
+        };
+
+        private static readonly Func<int, Color> VertebraColorMapper = value =>
+        {
+            if (value.IsInRange(0, 13)) return new Color(1.0, 1.0, 1.0, 0);
+            if (value.IsInRange(13, 256)) return new Color(1.0, 1.0, 1.0, 1.0);
+
+            return new Color();
         };
 
         public static void Main(string[] args)
@@ -30,10 +38,10 @@ namespace rt
             Directory.CreateDirectory(frames);
 
             // Scene
-            var matrix = Matrix.Create(181, 217, 181, "data/head-181x217x181.dat");
-            // var matrix = Matrix.Create(47, 512, 512, "data/vertebra-47x512x512.dat");
+            // var matrix = Matrix.Create(181, 217, 181, "data/head-181x217x181.dat");
+            var matrix = Matrix.Create(47, 512, 512, "data/vertebra-47x512x512.dat");
 
-            var colorMapper = HeadColorMapper;
+            var colorMapper = VertebraColorMapper;
 
             var lights = new[]
             {

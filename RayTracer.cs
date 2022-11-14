@@ -4,7 +4,7 @@ namespace rt
 {
     class RayTracer
     {
-        private static double FREQUENCY = 5;
+        private static double FREQUENCY = 1;
         
         private Geometry[] geometries;
         private Matrix matrix;
