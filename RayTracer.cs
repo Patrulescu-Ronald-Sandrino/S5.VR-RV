@@ -106,6 +106,7 @@ namespace rt
 
         private static Color Blend(Color color, Color other)
         {
+            return color * other;
             return new Color(
                 color.Red * color.Alpha + other.Red * other.Alpha * (1 - color.Alpha),
                 color.Green * color.Alpha + other.Green * other.Alpha * (1 - color.Alpha),
