@@ -23,6 +23,12 @@ namespace rt
 
             return new Color();
         };
+            
+        private static readonly object[] HeadInput = { 181, 217, 181, "data/head-181x217x181.dat", HeadColorMapper };
+
+        private static readonly object[] VertebraInput = { 47, 512, 512,  "data/vertebra-47x512x512.dat", VertebraColorMapper };
+
+        private static readonly object[] Input = HeadInput; /*TODO: switch this to change input data*/
 
         public static void Main(string[] args)
         {
@@ -38,10 +44,9 @@ namespace rt
             Directory.CreateDirectory(frames);
 
             // Scene
-            var matrix = Matrix.Create(181, 217, 181, "data/head-181x217x181.dat");
-            // var matrix = Matrix.Create(47, 512, 512, "data/vertebra-47x512x512.dat");
+            var matrix = Matrix.Create((int)Input[0], (int)Input[1], (int)Input[2], Input[3] as string);
 
-            var colorMapper = HeadColorMapper; // HeadColorMapper or VertebraColorMapper
+            var colorMapper = Input[4] as Func<int, Color>;
 
             var lights = new[]
             {
