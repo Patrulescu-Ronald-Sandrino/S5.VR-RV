@@ -61,6 +61,7 @@ namespace rt
         // https://gdbooks.gitbooks.io/3dcollisions/content/Chapter3/raycast_aabb.html
         private double FindFirstIntersection(Line cameraRay, double minDist, double maxDist)
         {
+            // bounding box 
             var vMin = new Vector(0, 0, 0);
             var vMax = new Vector(matrix.length, matrix.width, matrix.height);
 
@@ -91,9 +92,9 @@ namespace rt
         
         private Color GetMatrixPointColor(Vector point)
         {
-            var x = (int) Math.Round(point.X);
-            var y = (int) Math.Round(point.Y);
-            var z = (int) Math.Round(point.Z);
+            var x = (int) Math.Floor(point.X);
+            var y = (int) Math.Floor(point.Y);
+            var z = (int) Math.Floor(point.Z);
             // Console.WriteLine($"x: {x}, y: {y}, z: {z}");
             
             if (x < 0 || x >= matrix.length || y < 0 || y >= matrix.width || z < 0 || z >= matrix.height)
@@ -115,7 +116,7 @@ namespace rt
             );
         }
 
-        private Color FindColor(Line cameraRay, double minDist, double maxDist)
+        private Color FindColor(int i, int j, Line cameraRay, double minDist, double maxDist)
         {
             var t = FindFirstIntersection(cameraRay, minDist, maxDist);
             if (t.Equals(-1))
@@ -124,22 +125,49 @@ namespace rt
             }
             var intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
             var color = GetMatrixPointColor(intersectionPoint);
+            var passedThroughWhile = 0;
 
-            while (color.Alpha.GreaterThan(0) && color.Alpha.LessThan(1))
+            // debug print
+            if (false && color.Alpha.GreaterThanOrEquals(0.75))
             {
-                t = FindFirstIntersection(cameraRay, t + 0.0001 + FREQUENCY, maxDist);
+                Console.WriteLine($"" +
+                                  $"i: {i}, " +
+                                  $"j: {j}, " +
+                                  $"x: {intersectionPoint.X}, " +
+                                  $"y: {intersectionPoint.Y}, " +
+                                  $"z: {intersectionPoint.Z}, " +
+                                  $"t: {t}, " +
+                                  $"color: {color}, " +
+                                  $"passedThroughWhile: {passedThroughWhile}");
+            }
+
+            while (color.Alpha.LessThanOrEquals(1) && color.Alpha.GreaterThanOrEquals(0))
+            {
+                passedThroughWhile++;
+                if (i == 400 && j == 300)
+                {
+                    Console.Write("");
+                }
+                
+                t = FindFirstIntersection(cameraRay, t + FREQUENCY - 0.001, maxDist);
                 if (t.Equals(-1))
                 {
                     return color;
                 }
+                Console.WriteLine("here");
+                
+                if (passedThroughWhile > 0)
+                    Console.WriteLine($"pixel i = {i}, j = {j} passedThroughWhile: {passedThroughWhile}");
                 intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
                 var newColor = GetMatrixPointColor(intersectionPoint);
                 color = Blend(color, newColor);
             }
+
             
             return color;
         }
 
+        // frames at /mnt/e/UBB_IE_2020-2023/S5.VR/volume-renderer-Patrulescu-Ronald-Sandrino/bin/Debug/netcoreapp3.1/frames/
         public void Render(Camera camera, int width, int height, string filename)
         {
             var image = new Image(width, height);
@@ -156,7 +184,7 @@ namespace rt
 
                     #region ADD CODE HERE: Implement pixel color calculation
 
-                    image.SetPixel(i, j, FindColor(cameraRay, camera.FrontPlaneDistance, camera.BackPlaneDistance));
+                    image.SetPixel(i, j, FindColor(i, j, cameraRay, camera.FrontPlaneDistance, camera.BackPlaneDistance));
                     
                     #endregion
                 }

@@ -11,12 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="data\head-181x217x181.dat" />
-      <Content Include="data\head-181x217x181.dat">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <None Remove="data\vertebra-47x512x512.dat" />
-      <Content Include="data\vertebra-47x512x512.dat">
+      <Content Include="data\*">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
