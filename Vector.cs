@@ -82,5 +82,10 @@ namespace rt
         {
             return X.Equals(value) && Y.Equals(value) && Z.Equals(value);
         }
+        
+        public override string ToString()
+        {
+            return $"({X:F3}, {Y:F3}, {Z:F3})";
+        }
     }
 }

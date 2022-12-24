@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Text;
+using System.IO;
 
 namespace rt
 {
-    class RayTracer
+    class RayTracer : IDisposable
     {
         private const double Frequency = 1;
         
@@ -11,7 +11,9 @@ namespace rt
         private readonly Func<int, Color> _colorMapper;
         private readonly Light[] _lights;
 
-        private readonly StringBuilder _outputSb = new StringBuilder();
+        private static int _instance = 1;
+        private readonly TextWriter _file = TextWriter.Synchronized(new StreamWriter($"output-{_instance++}.txt", false, System.Text.Encoding.ASCII, 8192));
+         
 
         public RayTracer(Matrix matrix, Func<int, Color> colorMapper, Light[] lights)
         {
@@ -120,7 +122,7 @@ namespace rt
         {
             var t = FindFirstIntersection(cameraRay, minDist, maxDist);
             if (t.Equals(-1)) return new Color();
-            _outputSb.Append($"");
+            _file.WriteLine($"{cameraRay.X0},{cameraRay.Dx},{t:F3},{i},{j}");
             
             var intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
             var color = GetMatrixPointColor(intersectionPoint);
@@ -192,9 +194,10 @@ namespace rt
             image.Store(filename);
         }
     
-        public string GetOutput()
+        public void Dispose()
         {
-            return _outputSb.ToString();
+            _file.Flush();
+            _file?.Dispose();
         }
     }
 }

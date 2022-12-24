@@ -105,7 +105,6 @@ namespace rt
                 });
             }
             Task.WaitAll(tasks);
-            Console.WriteLine(rt.GetOutput());
         }
 
         public static void Main(string[] args)
