@@ -4,21 +4,20 @@ namespace rt
 {
     class RayTracer
     {
-        private static double FREQUENCY = 1;
+        private const double Frequency = 1;
         
-        private Geometry[] geometries;
-        private Matrix matrix;
-        private Func<int, Color> colorMapper;
-        private Light[] lights;
+        private readonly Matrix _matrix;
+        private readonly Func<int, Color> _colorMapper;
+        private readonly Light[] _lights;
 
         public RayTracer(Matrix matrix, Func<int, Color> colorMapper, Light[] lights)
         {
-            this.matrix = matrix;
-            this.colorMapper = colorMapper;
-            this.lights = lights;
+            _matrix = matrix;
+            _colorMapper = colorMapper;
+            _lights = lights;
         }
 
-        private double ImageToViewPlane(int n, int imgSize, double viewPlaneSize)
+        private static double ImageToViewPlane(int n, int imgSize, double viewPlaneSize)
         {
             var u = n * viewPlaneSize / imgSize;
             u -= viewPlaneSize / 2;
@@ -63,7 +62,7 @@ namespace rt
         {
             // bounding box 
             var vMin = new Vector(0, 0, 0);
-            var vMax = new Vector(matrix.length, matrix.width, matrix.height);
+            var vMax = new Vector(_matrix.length, _matrix.width, _matrix.height);
 
             var tMinX = (vMin.X - cameraRay.X0.X) / cameraRay.Dx.X;
             var tMaxX = (vMax.X - cameraRay.X0.X) / cameraRay.Dx.X;
@@ -97,12 +96,12 @@ namespace rt
             var z = (int) Math.Floor(point.Z);
             // Console.WriteLine($"x: {x}, y: {y}, z: {z}");
             
-            if (x < 0 || x >= matrix.length || y < 0 || y >= matrix.width || z < 0 || z >= matrix.height)
+            if (x < 0 || x >= _matrix.length || y < 0 || y >= _matrix.width || z < 0 || z >= _matrix.height)
             {
                 return new Color();
             }
 
-            return colorMapper(matrix.data[x, y, z]);
+            return _colorMapper(_matrix.data[x, y, z]);
         }
 
         private static Color Blend(Color color, Color other)
@@ -119,10 +118,8 @@ namespace rt
         private Color FindColor(int i, int j, Line cameraRay, double minDist, double maxDist)
         {
             var t = FindFirstIntersection(cameraRay, minDist, maxDist);
-            if (t.Equals(-1))
-            {
-                return new Color();
-            }
+            if (t.Equals(-1)) return new Color();
+            
             var intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
             var color = GetMatrixPointColor(intersectionPoint);
             var passedThroughWhile = 0;
@@ -149,7 +146,7 @@ namespace rt
                     Console.Write("");
                 }
                 
-                t = FindFirstIntersection(cameraRay, t + FREQUENCY - 0.001, maxDist);
+                t = FindFirstIntersection(cameraRay, t + Frequency - 0.001, maxDist);
                 if (t.Equals(-1))
                 {
                     return color;
