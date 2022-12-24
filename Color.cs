@@ -72,5 +72,15 @@ namespace rt
         {
             return new Color(c.Red / k, c.Green / k, c.Blue / k, c.Alpha / k);
         }
+
+        public Color Blend(Color other)
+        {
+            return new Color(
+                Red * Alpha + other.Red * other.Alpha * (1 - Alpha),
+                Green * Alpha + other.Green * other.Alpha * (1 - Alpha),
+                Blue * Alpha + other.Blue * other.Alpha * (1 - Alpha),
+                Alpha + other.Alpha * (1 - other.Alpha)
+            );
+        }
     }
 }

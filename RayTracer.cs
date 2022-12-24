@@ -107,17 +107,6 @@ namespace rt
             return _colorMapper(_matrix.data[x, y, z]);
         }
 
-        private static Color Blend(Color color, Color other)
-        {
-            return color * other;
-            return new Color(
-                color.Red * color.Alpha + other.Red * other.Alpha * (1 - color.Alpha),
-                color.Green * color.Alpha + other.Green * other.Alpha * (1 - color.Alpha),
-                color.Blue * color.Alpha + other.Blue * other.Alpha * (1 - color.Alpha),
-                color.Alpha + (1 - other.Alpha) * other.Alpha
-            );
-        }
-
         private Color FindColor(int i, int j, Line cameraRay, double minDist, double maxDist)
         {
             var t = FindFirstIntersection(cameraRay, minDist, maxDist);
@@ -161,7 +150,7 @@ namespace rt
                     Console.WriteLine($"pixel i = {i}, j = {j} passedThroughWhile: {passedThroughWhile}");
                 intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
                 var newColor = GetMatrixPointColor(intersectionPoint);
-                color = Blend(color, newColor);
+                color = color.Blend(newColor);
             }
 
             
