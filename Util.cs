@@ -36,5 +36,10 @@ namespace rt
         {
             return value.LessThan(other) || value.Equals(other);
         }
+        
+        public static bool IsInRange(this double value, double min, double max)
+        {
+            return value.GreaterThanOrEquals(min) && value.LessThanOrEquals(max);
+        }
     }
 }

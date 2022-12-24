@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace rt
@@ -7,8 +8,8 @@ namespace rt
     public class Program
     {
         // {0=x, 1=y, 2=z, 3=file.dat, 4=color mapper, 5=x0, 6=y0, 7=z0, 8=x1, 9=y1, 10=z1, 11=dist, 12=name}    
-        private static readonly object[] HeadInput = { 181, 217, 181, "data/head-181x217x181.dat", ReadColorMappingsFile("data/head-color-mappings.txt"), 0f, 0f, 0f, 160f, 217f, 181f, 200.0, "head" };
-        private static readonly object[] VertebraInput = { 47, 512, 512,  "data/vertebra-47x512x512.dat", ReadColorMappingsFile("data/vertebra-color-mappings.txt"), 0f, 120f, 150f, 47f, 248f, 362f, 150.0, "vertebra" };
+        private static readonly object[] HeadInput = { 181, 217, 181, "data/head-181x217x181.dat", ReadColorMappingsFile("data/head-color-mappings1.txt"), 0.0, 0.0, 0.0, 160.0, 217.0, 181.0, 200.0, "head" };
+        private static readonly object[] VertebraInput = { 47, 512, 512,  "data/vertebra-47x512x512.dat", ReadColorMappingsFile("data/vertebra-color-mappings2.txt"), 0.0, 120.0, 150.0, 47.0, 248.0, 362.0, 150.0, "vertebra" };
 
         private static readonly object[][] Input = { HeadInput, VertebraInput };
 
@@ -42,14 +43,14 @@ namespace rt
                     1.0
                 ),
                 new Light(
-                    new Vector(20.0, 20.0, 0.0),
+                    new Vector(0.0, -50.0, 0.0),
                     new Color(0.8, 0.8, 0.8, 1.0),
                     new Color(0.8, 0.8, 0.8, 1.0),
                     new Color(0.8, 0.8, 0.8, 1.0),
                     1.0
                 ),
                 new Light(
-                    new Vector(0.0, 0.0, 300.0),
+                    new Vector(0.0, 0.0, -50.0),
                     new Color(0.8, 0.8, 0.8, 1.0),
                     new Color(0.8, 0.8, 0.8, 1.0),
                     new Color(0.8, 0.8, 0.8, 1.0),
@@ -59,7 +60,7 @@ namespace rt
 
             #endregion
             
-            var matrix = Matrix.Create((int)input[0], (int)input[1], (int)input[2], input[3] as string);
+            var matrix = Matrix.Create((int)input[0], (int)input[1], (int)input[2], input.Skip(5).Take(6).ToArray(), input[3] as string);
             var colorMapper = input[4] as Func<int, Color>;
             var rt = new RayTracer(matrix, colorMapper, lights);
 
@@ -67,11 +68,11 @@ namespace rt
             const int height = 600;
 
             // Go around an approximate middle of the scene and generate frames
-            var middle = new Vector(((float)input[5] + (float)input[8])/2, ((float)input[6] + (float)input[9])/2, ((float)input[7] + (float)input[10])/2);
+            var middle = new Vector(((double)input[5] + (double)input[8])/2, ((double)input[6] + (double)input[9])/2, ((double)input[7] + (double)input[10])/2);
             var up = new Vector(0.01, -1.01, 0.01).Normalize();
             var first = (middle ^ up).Normalize();
             var dist = (double)input[11];
-            const int n = 90;
+            const int n = 30;
             const double step = 360.0 / n;
 
             var tasks = new Task[n];
@@ -117,7 +118,6 @@ namespace rt
 
         private static Func<int, Color> ReadColorMappingsFile(string path) {
             var lines = File.ReadAllLines(path);
-            var stringToFloat = new Func<string, float>(float.Parse);
             var stringToColor = new Func<string, Color>(line => new Color(double.Parse(line.Split(' ')[0]), double.Parse(line.Split(' ')[1]), double.Parse(line.Split(' ')[2]), double.Parse(line.Split(' ')[3])));
             var colorMappings = new Color[int.Parse(lines[^1])];
             for (var i = 0; i < lines.Length - 1; i+=2)
