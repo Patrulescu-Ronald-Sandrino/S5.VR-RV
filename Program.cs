@@ -8,7 +8,7 @@ namespace rt
     {
         // {0=x, 1=y, 2=z, 3=file.dat, 4=color mapper, 5=x0, 6=y0, 7=z0, 8=x1, 9=y1, 10=z1, 11=dist, 12=name}    
         private static readonly object[] HeadInput = { 181, 217, 181, "data/head-181x217x181.dat", ReadColorMappingsFile("data/head-color-mappings.txt"), 0f, 0f, 0f, 160f, 217f, 181f, 200.0, "head" };
-        private static readonly object[] VertebraInput = { 47, 512, 512,  "data/vertebra-47x512x512.dat", ReadColorMappingsFile("data/vertebra-color-mappings.txt"), 0f, 120f, 150f, 46f, 248f, 362f, 150.0, "vertebra" };
+        private static readonly object[] VertebraInput = { 47, 512, 512,  "data/vertebra-47x512x512.dat", ReadColorMappingsFile("data/vertebra-color-mappings.txt"), 0f, 120f, 150f, 47f, 248f, 362f, 150.0, "vertebra" };
 
         private static readonly object[][] Input = { HeadInput, VertebraInput };
 

@@ -98,11 +98,20 @@ namespace rt
             var y = (int) Math.Floor(point.Y);
             var z = (int) Math.Floor(point.Z);
             // Console.WriteLine($"x: {x}, y: {y}, z: {z}");
+
+            if (x == _matrix.length) x--;
+            if (y == _matrix.width) y--;
+            if (z == _matrix.height) z--;
+
+            // TODO: switch between this or next block
+            if (x == -1) x = 0;
+            if (y == -1) y = 0;
+            if (z == -1) z = 0;
             
-            if (x < 0 || x >= _matrix.length || y < 0 || y >= _matrix.width || z < 0 || z >= _matrix.height)
-            {
-                return new Color();
-            }
+            // if (x < 0 || y < 0 || z < 0)
+            // {
+            //     return new Color();
+            // }
 
             return _colorMapper(_matrix.data[x, y, z]);
         }
