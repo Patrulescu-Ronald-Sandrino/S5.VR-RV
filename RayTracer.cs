@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace rt
 {
@@ -9,6 +10,8 @@ namespace rt
         private readonly Matrix _matrix;
         private readonly Func<int, Color> _colorMapper;
         private readonly Light[] _lights;
+
+        private readonly StringBuilder _outputSb = new StringBuilder();
 
         public RayTracer(Matrix matrix, Func<int, Color> colorMapper, Light[] lights)
         {
@@ -119,6 +122,7 @@ namespace rt
         {
             var t = FindFirstIntersection(cameraRay, minDist, maxDist);
             if (t.Equals(-1)) return new Color();
+            _outputSb.Append($"");
             
             var intersectionPoint = cameraRay.X0 + cameraRay.Dx * t;
             var color = GetMatrixPointColor(intersectionPoint);
@@ -188,6 +192,11 @@ namespace rt
             }
 
             image.Store(filename);
+        }
+    
+        public string GetOutput()
+        {
+            return _outputSb.ToString();
         }
     }
 }
